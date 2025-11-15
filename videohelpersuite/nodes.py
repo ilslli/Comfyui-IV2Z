@@ -681,5 +681,5 @@ NODE_CLASS_MAPPINGS = {
     "IV2Z_VideoCombine": VideoCombine,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "IV2Z_VideoCombine": "Video Combine",
+    "IV2Z_VideoCombine": "IV2Z Video Combine",
 }

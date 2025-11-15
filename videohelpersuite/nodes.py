@@ -13,6 +13,7 @@ from pathlib import Path
 from string import Template
 import itertools
 import functools
+import zipfile
 
 import folder_paths
 from .logger import logger
@@ -246,6 +247,7 @@ class VideoCombine:
                 "format": (["image/gif", "image/webp"] + ffmpeg_formats, {'formats': format_widgets}),
                 "pingpong": ("BOOLEAN", {"default": False}),
                 "save_output": ("BOOLEAN", {"default": True}),
+                "save_as_zip": ("BOOLEAN", {"default": False}), # 打包为zip
             },
             "optional": {
                 "audio": ("AUDIO",),
@@ -282,6 +284,7 @@ class VideoCombine:
         manual_format_widgets=None,
         meta_batch=None,
         vae=None,
+        save_as_zip=False, # 打包为zip
         **kwargs
     ):
         if latents is not None:
@@ -618,6 +621,17 @@ class VideoCombine:
         if num_frames == 1 and 'png' in format and '%03d' in file:
             preview['format'] = 'image/png'
             preview['filename'] = file.replace('%03d', '001')
+
+        if save_as_zip and output_files:
+            zip_filename = f"{filename}_{counter:05}.zip"
+            zip_path = os.path.join(full_output_folder, zip_filename)
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                for file in output_files:
+                    if os.path.exists(file):
+                        arcname = os.path.basename(file)
+                        zf.write(file, arcname)
+            output_files.append(zip_path)
+
         return {"ui": {"gifs": [preview]}, "result": ((save_output, output_files),)}
 
 

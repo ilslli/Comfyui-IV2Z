@@ -23,10 +23,10 @@ from .utils import ffmpeg_path, get_audio, hash_path, validate_path, requeue_wor
         ContainsAll
 from comfy.utils import ProgressBar
 
-if 'VHS_video_formats' not in folder_paths.folder_names_and_paths:
-    folder_paths.folder_names_and_paths["VHS_video_formats"] = ((),{".json"})
-if len(folder_paths.folder_names_and_paths['VHS_video_formats'][1]) == 0:
-    folder_paths.folder_names_and_paths["VHS_video_formats"][1].add(".json")
+if 'IV2Z_video_formats' not in folder_paths.folder_names_and_paths:
+    folder_paths.folder_names_and_paths["IV2Z_video_formats"] = ((),{".json"})
+if len(folder_paths.folder_names_and_paths['IV2Z_video_formats'][1]) == 0:
+    folder_paths.folder_names_and_paths["IV2Z_video_formats"][1].add(".json")
 audio_extensions = ['mp3', 'mp4', 'wav', 'ogg']
 
 def flatten_list(l):
@@ -63,8 +63,8 @@ base_formats_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 @cached(5)
 def get_video_formats():
     format_files = {}
-    for format_name in folder_paths.get_filename_list("VHS_video_formats"):
-        format_files[format_name] = folder_paths.get_full_path("VHS_video_formats", format_name)
+    for format_name in folder_paths.get_filename_list("IV2Z_video_formats"):
+        format_files[format_name] = folder_paths.get_full_path("IV2Z_video_formats", format_name)
     for item in os.scandir(base_formats_dir):
         if not item.is_file() or not item.name.endswith('.json'):
             continue
@@ -87,7 +87,7 @@ def apply_format_widgets(format_name, kwargs):
     if os.path.exists(os.path.join(base_formats_dir, format_name + ".json")):
         video_format_path = os.path.join(base_formats_dir, format_name + ".json")
     else:
-        video_format_path = folder_paths.get_full_path("VHS_video_formats", format_name)
+        video_format_path = folder_paths.get_full_path("IV2Z_video_formats", format_name)
     with open(video_format_path, 'r') as stream:
         video_format = json.load(stream)
     for w in iterate_format(video_format):
@@ -249,7 +249,7 @@ class VideoCombine:
             },
             "optional": {
                 "audio": ("AUDIO",),
-                "meta_batch": ("VHS_BatchManager",),
+                "meta_batch": ("IV2Z_BatchManager",),
                 "vae": ("VAE",),
             },
             "hidden": ContainsAll({
@@ -259,10 +259,10 @@ class VideoCombine:
             }),
         }
 
-    RETURN_TYPES = ("VHS_FILENAMES",)
+    RETURN_TYPES = ("IV2Z_FILENAMES",)
     RETURN_NAMES = ("Filenames",)
     OUTPUT_NODE = True
-    CATEGORY = "Video Helper Suite 🎥🅥🅗🅢"
+    CATEGORY = "Video Helper Suite"
     FUNCTION = "combine_video"
 
     def combine_video(
@@ -375,7 +375,7 @@ class VideoCombine:
         # save first frame as png to keep metadata
         first_image_file = f"{filename}_{counter:05}.png"
         file_path = os.path.join(full_output_folder, first_image_file)
-        if extra_options.get('VHS_MetadataImage', True) != False:
+        if extra_options.get('IV2Z_MetadataImage', True) != False:
             Image.fromarray(tensor_to_bytes(first_image)).save(
                 file_path,
                 pnginfo=metadata,
@@ -559,7 +559,7 @@ class VideoCombine:
             a_waveform = None
             if audio is not None:
                 try:
-                    #safely check if audio produced by VHS_LoadVideo actually exists
+                    #safely check if audio produced by IV2Z_LoadVideo actually exists
                     a_waveform = audio['waveform']
                 except:
                     pass
@@ -602,7 +602,7 @@ class VideoCombine:
                 #Return this file with audio to the webui.
                 #It will be muted unless opened or saved with right click
                 file = output_file_with_audio
-        if extra_options.get('VHS_KeepIntermediate', True) == False:
+        if extra_options.get('IV2Z_KeepIntermediate', True) == False:
             for intermediate in output_files[1:-1]:
                 if os.path.exists(intermediate):
                     os.remove(intermediate)
@@ -623,8 +623,8 @@ class VideoCombine:
 
 
 NODE_CLASS_MAPPINGS = {
-    "VHS_VideoCombine": VideoCombine,
+    "IV2Z_VideoCombine": VideoCombine,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VHS_VideoCombine": "Video Combine 🎥🅥🅗🅢",
+    "IV2Z_VideoCombine": "Video Combine",
 }

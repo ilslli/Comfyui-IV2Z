@@ -21,7 +21,7 @@ from .utils import BIGMAX, DIMMAX, calculate_file_hash, get_sorted_dir_files_fro
 
 video_extensions = ['webm', 'mp4', 'mkv', 'gif', 'mov']
 
-VHSLoadFormats = {
+IV2ZLoadFormats = {
     'None': {},
     'AnimateDiff': {'target_rate': 8, 'dim': (8,0,512,512)},
     'Mochi': {'target_rate': 24, 'dim': (16,0,848,480), 'frames':(6,1)},
@@ -31,25 +31,25 @@ VHSLoadFormats = {
     'Wan': {'target_rate': 16, 'dim': (8,0,832,480), 'frames':(4,1)},
 }
 """
-External plugins may add additional formats to nodes.VHSLoadFormats
+External plugins may add additional formats to nodes.IV2ZLoadFormats
 In addition to shorthand options, direct widget names will map a given dict to options.
 Adding a third arguement to a frames tuple can enable strict checks on number
 of loaded frames, i.e (8,1,True)
 """
-if not hasattr(nodes, 'VHSLoadFormats'):
-    nodes.VHSLoadFormats = {}
+if not hasattr(nodes, 'IV2ZLoadFormats'):
+    nodes.IV2ZLoadFormats = {}
 
 def get_load_formats():
-    #TODO: check if {**extra_config.VHSLoafFormats, **VHSLoadFormats} has minimum version
+    #TODO: check if {**extra_config.IV2ZLoafFormats, **IV2ZLoadFormats} has minimum version
     formats = {}
-    formats.update(nodes.VHSLoadFormats)
-    formats.update(VHSLoadFormats)
+    formats.update(nodes.IV2ZLoadFormats)
+    formats.update(IV2ZLoadFormats)
     return (list(formats.keys()),
             {'default': 'AnimateDiff', 'formats': formats})
 def get_format(format):
-    if format in VHSLoadFormats:
-        return VHSLoadFormats[format]
-    return nodes.VHSLoadFormats.get(format, {})
+    if format in IV2ZLoadFormats:
+        return IV2ZLoadFormats[format]
+    return nodes.IV2ZLoadFormats.get(format, {})
 
 def is_gif(filename) -> bool:
     file_parts = filename.split('.')
@@ -440,7 +440,7 @@ class LoadVideoUpload:
                     "select_every_nth": ("INT", {"default": 1, "min": 1, "max": BIGMAX, "step": 1}),
                     },
                 "optional": {
-                    "meta_batch": ("VHS_BatchManager",),
+                    "meta_batch": ("IV2Z_BatchManager",),
                     "vae": ("VAE",),
                      "format": get_load_formats(),
                 },
@@ -452,7 +452,7 @@ class LoadVideoUpload:
 
     CATEGORY = "Video Helper Suite 🎥🅥🅗🅢"
 
-    RETURN_TYPES = (imageOrLatent, "INT", "AUDIO", "VHS_VIDEOINFO")
+    RETURN_TYPES = (imageOrLatent, "INT", "AUDIO", "IV2Z_VIDEOINFO")
     RETURN_NAMES = ("IMAGE", "frame_count", "audio", "video_info")
 
     FUNCTION = "load_video"
@@ -478,7 +478,7 @@ class LoadVideoPath:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "video": ("STRING", {"placeholder": "X://insert/path/here.mp4", "vhs_path_extensions": video_extensions}),
+                "video": ("STRING", {"placeholder": "X://insert/path/here.mp4", "IV2Z_path_extensions": video_extensions}),
                 "force_rate": (floatOrInt, {"default": 0, "min": 0, "max": 60, "step": 1, "disable": 0}),
                 "custom_width": ("INT", {"default": 0, "min": 0, "max": DIMMAX, 'disable': 0}),
                 "custom_height": ("INT", {"default": 0, "min": 0, "max": DIMMAX, 'disable': 0}),
@@ -487,7 +487,7 @@ class LoadVideoPath:
                 "select_every_nth": ("INT", {"default": 1, "min": 1, "max": BIGMAX, "step": 1}),
             },
             "optional": {
-                "meta_batch": ("VHS_BatchManager",),
+                "meta_batch": ("IV2Z_BatchManager",),
                 "vae": ("VAE",),
                 "format": get_load_formats(),
             },
@@ -499,7 +499,7 @@ class LoadVideoPath:
 
     CATEGORY = "Video Helper Suite 🎥🅥🅗🅢"
 
-    RETURN_TYPES = (imageOrLatent, "INT", "AUDIO", "VHS_VIDEOINFO")
+    RETURN_TYPES = (imageOrLatent, "INT", "AUDIO", "IV2Z_VIDEOINFO")
     RETURN_NAMES = ("IMAGE", "frame_count", "audio", "video_info")
 
     FUNCTION = "load_video"
@@ -535,10 +535,10 @@ class LoadVideoFFmpegUpload:
                     "custom_width": ("INT", {"default": 0, "min": 0, "max": DIMMAX, 'disable': 0}),
                     "custom_height": ("INT", {"default": 0, "min": 0, "max": DIMMAX, 'disable': 0}),
                     "frame_load_cap": ("INT", {"default": 0, "min": 0, "max": BIGMAX, "step": 1, "disable": 0}),
-                    "start_time": ("FLOAT", {"default": 0, "min": 0, "max": BIGMAX, "step": .001, "widgetType": "VHSTIMESTAMP"}),
+                    "start_time": ("FLOAT", {"default": 0, "min": 0, "max": BIGMAX, "step": .001, "widgetType": "IV2ZTIMESTAMP"}),
                     },
                 "optional": {
-                    "meta_batch": ("VHS_BatchManager",),
+                    "meta_batch": ("IV2Z_BatchManager",),
                     "vae": ("VAE",),
                      "format": get_load_formats(),
                 },
@@ -551,7 +551,7 @@ class LoadVideoFFmpegUpload:
 
     CATEGORY = "Video Helper Suite 🎥🅥🅗🅢"
 
-    RETURN_TYPES = (imageOrLatent, "MASK", "AUDIO", "VHS_VIDEOINFO")
+    RETURN_TYPES = (imageOrLatent, "MASK", "AUDIO", "IV2Z_VIDEOINFO")
     RETURN_NAMES = ("IMAGE", "mask", "audio", "video_info")
 
     FUNCTION = "load_video"
@@ -580,15 +580,15 @@ class LoadVideoFFmpegPath:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "video": ("STRING", {"placeholder": "X://insert/path/here.mp4", "vhs_path_extensions": video_extensions}),
+                "video": ("STRING", {"placeholder": "X://insert/path/here.mp4", "IV2Z_path_extensions": video_extensions}),
                 "force_rate": (floatOrInt, {"default": 0, "min": 0, "max": 60, "step": 1, "disable": 0}),
                 "custom_width": ("INT", {"default": 0, "min": 0, "max": DIMMAX, 'disable': 0}),
                 "custom_height": ("INT", {"default": 0, "min": 0, "max": DIMMAX, 'disable': 0}),
                 "frame_load_cap": ("INT", {"default": 0, "min": 0, "max": BIGMAX, "step": 1, "disable": 0}),
-                "start_time": ("FLOAT", {"default": 0, "min": 0, "max": BIGMAX, "step": .001, "widgetType": "VHSTIMESTAMP"}),
+                "start_time": ("FLOAT", {"default": 0, "min": 0, "max": BIGMAX, "step": .001, "widgetType": "IV2ZTIMESTAMP"}),
             },
             "optional": {
-                "meta_batch": ("VHS_BatchManager",),
+                "meta_batch": ("IV2Z_BatchManager",),
                 "vae": ("VAE",),
                 "format": get_load_formats(),
             },
@@ -600,7 +600,7 @@ class LoadVideoFFmpegPath:
 
     CATEGORY = "Video Helper Suite 🎥🅥🅗🅢"
 
-    RETURN_TYPES = (imageOrLatent, "MASK", "AUDIO", "VHS_VIDEOINFO")
+    RETURN_TYPES = (imageOrLatent, "MASK", "AUDIO", "IV2Z_VIDEOINFO")
     RETURN_NAMES = ("IMAGE", "mask", "audio", "video_info")
 
     FUNCTION = "load_video"
@@ -630,7 +630,7 @@ class LoadImagePath:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "image": ("STRING", {"placeholder": "X://insert/path/here.png", "vhs_path_extensions": list(FolderOfImages.IMG_EXTENSIONS)}),
+                "image": ("STRING", {"placeholder": "X://insert/path/here.png", "IV2Z_path_extensions": list(FolderOfImages.IMG_EXTENSIONS)}),
                 "custom_width": ("INT", {"default": 0, "min": 0, "max": DIMMAX, "step": 8, 'disable': 0}),
                 "custom_height": ("INT", {"default": 0, "min": 0, "max": DIMMAX, "step": 8, 'disable': 0}),
             },

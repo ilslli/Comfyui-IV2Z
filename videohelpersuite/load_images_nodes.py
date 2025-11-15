@@ -134,7 +134,7 @@ class LoadImagesFromDirectoryUpload:
                 "image_load_cap": ("INT", {"default": 0, "min": 0, "max": BIGMAX, "step": 1}),
                 "skip_first_images": ("INT", {"default": 0, "min": 0, "max": BIGMAX, "step": 1}),
                 "select_every_nth": ("INT", {"default": 1, "min": 1, "max": BIGMAX, "step": 1}),
-                "meta_batch": ("VHS_BatchManager",),
+                "meta_batch": ("IV2Z_BatchManager",),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID"
@@ -167,13 +167,13 @@ class LoadImagesFromDirectoryPath:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "directory": ("STRING", {"placeholder": "X://path/to/images", "vhs_path_extensions": []}),
+                "directory": ("STRING", {"placeholder": "X://path/to/images", "IV2Z_path_extensions": []}),
             },
             "optional": {
                 "image_load_cap": ("INT", {"default": 0, "min": 0, "max": BIGMAX, "step": 1}),
                 "skip_first_images": ("INT", {"default": 0, "min": 0, "max": BIGMAX, "step": 1}),
                 "select_every_nth": ("INT", {"default": 1, "min": 1, "max": BIGMAX, "step": 1}),
-                "meta_batch": ("VHS_BatchManager",),
+                "meta_batch": ("IV2Z_BatchManager",),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID"

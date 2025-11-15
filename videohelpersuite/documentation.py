@@ -3,9 +3,9 @@ from .logger import logger
 def image(src):
     return f'<img src={src} loading=lazy style="width: 0px; min-width: 100%">'
 def video(src):
-    return f'<video preload="none" src={src} muted loop controls controlslist="nodownload noremoteplayback noplaybackrate" style="width: 0px; min-width: 100%" class="VHS_loopedvideo">'
+    return f'<video preload="none" src={src} muted loop controls controlslist="nodownload noremoteplayback noplaybackrate" style="width: 0px; min-width: 100%" class="IV2Z_loopedvideo">'
 def short_desc(desc):
-    return f'<div id=VHS_shortdesc>{desc}</div>'
+    return f'<div id=IV2Z_shortdesc>{desc}</div>'
 
 def format_each(desc, **kwargs):
     if isinstance(desc, dict):
@@ -43,8 +43,8 @@ common_descriptions = {
     'Determines what method to use if scaling is required',
  ],
   'crop_method': 'When sizes don\'t match, should the resized image have it\'s aspect ratio changed, or be cropped to maintain aspect ratio',
-  'VHS_PATH': [
-    'This is a VHS_PATH input. When edited, it provides a list of possible valid files or directories',
+  'IV2Z_PATH': [
+    'This is a IV2Z_PATH input. When edited, it provides a list of possible valid files or directories',
     video('https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite/assets/4284322/729b7185-1fca-41d8-bc8d-a770bb2a5ce6'),
     'The current top-most completion may be selected with Tab',
     'You can navigate up a directory by pressing Ctrl+B (or Ctrl+W if supported by browser)',
@@ -102,7 +102,7 @@ descriptions = {
             'yuv420p10le': 'Use 10 bit color depth. This can improve color quality when combined with 16bit input color depth',
             'yuva420p': 'Include transparency in the output video'
             }],
-        'input_color_depth': 'VHS supports outputting 16bit images. While this produces higher quality output, the difference usually isn\'t visible without postprocessing and it significantly increases file size and processing time.',
+        'input_color_depth': 'IV2Z supports outputting 16bit images. While this produces higher quality output, the difference usually isn\'t visible without postprocessing and it significantly increases file size and processing time.',
         'save_metadata': 'Determines if metadata for the workflow should be included in the output video file',
         }
     }],
@@ -120,8 +120,8 @@ def as_html(entry, depth=0):
                 name = k[:-len("_collapsed")]
             else:
                 name = k
-            collapse_flag = ' VHS_precollapse' if entry.get("collapsed", False) or collapse_single else ''
-            html += f'<div vhs_title=\"{name}\" style=\"display: flex; font-size: {size}em\" class=\"VHS_collapse{collapse_flag}\"><div style=\"color: #AAA; height: 1.5em;\">[<span style=\"font-family: monospace\">-</span>]</div><div style=\"width: 100%\">{name}: {as_html(entry[k], depth=depth+1)}</div></div>'
+            collapse_flag = ' IV2Z_precollapse' if entry.get("collapsed", False) or collapse_single else ''
+            html += f'<div IV2Z_title=\"{name}\" style=\"display: flex; font-size: {size}em\" class=\"IV2Z_collapse{collapse_flag}\"><div style=\"color: #AAA; height: 1.5em;\">[<span style=\"font-family: monospace\">-</span>]</div><div style=\"width: 100%\">{name}: {as_html(entry[k], depth=depth+1)}</div></div>'
         return html
     if isinstance(entry, list):
         if depth == 0:

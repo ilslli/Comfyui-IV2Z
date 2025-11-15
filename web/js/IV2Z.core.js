@@ -3,7 +3,7 @@ import { api } from '../../../scripts/api.js'
 import { setWidgetConfig } from '../../../extensions/core/widgetInputs.js'
 import { applyTextReplacements } from "../../../scripts/utils.js";
 
-function chainCallback(object, property, callback) {
+function IV2Z_chainCallback(object, property, callback) {
     if (object == undefined) {
         //This should not happen.
         console.error("Tried to add callback to non-existant object")
@@ -20,7 +20,7 @@ function chainCallback(object, property, callback) {
     }
 }
 
-function getNodeById(id, graph=app.graph) {
+function IV2Z_getNodeById(id, graph=app.graph) {
     let cg = graph
     let node = undefined
     for (let sid of (''+id).split(':')) {
@@ -30,13 +30,13 @@ function getNodeById(id, graph=app.graph) {
     return node
 }
 
-const convDict = {
-    VHS_VideoCombine : ["frame_rate", "loop_count", "filename_prefix", "format", "pingpong", "save_image"],
+const IV2Z_convDict = {
+    IV2Z_VideoCombine : ["frame_rate", "loop_count", "filename_prefix", "format", "pingpong", "save_image"],
 };
-const renameDict  = {VHS_VideoCombine : {save_output : "save_image"}}
-function useKVState(nodeType) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function () {
-        chainCallback(this, "onConfigure", function(info) {
+const IV2Z_renameDict  = {IV2Z_VideoCombine : {save_output : "save_image"}}
+function IV2Z_useKVState(nodeType) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function () {
+        IV2Z_chainCallback(this, "onConfigure", function(info) {
             if (!this.widgets) {
                 //Node has no widgets, there is nothing to restore
                 return
@@ -48,9 +48,9 @@ function useKVState(nodeType) {
             let widgetDict = info.widgets_values
             if (info.widgets_values.length) {
                 //widgets_values is in the old list format
-                if (this.type in convDict) {
+                if (this.type in IV2Z_convDict) {
                     //widget does not have a conversion format provided
-                    let convList = convDict[this.type];
+                    let convList = IV2Z_convDict[this.type];
                     if(info.widgets_values.length >= convList.length) {
                         //has all required fields
                         widgetDict = {}
@@ -107,9 +107,9 @@ function useKVState(nodeType) {
                         w.callback?.(w.value)
                     } else {
                         //Check for a legacy name that needs migrating
-                        if (this.type in renameDict && w.name in renameDict[this.type]) {
-                            if (renameDict[this.type][w.name] in widgetDict) {
-                                w.value = widgetDict[renameDict[this.type][w.name]]
+                        if (this.type in IV2Z_renameDict && w.name in IV2Z_renameDict[this.type]) {
+                            if (IV2Z_renameDict[this.type][w.name] in widgetDict) {
+                                w.value = widgetDict[IV2Z_renameDict[this.type][w.name]]
                                 w.callback?.(w.value)
                                 continue
                             }
@@ -151,7 +151,7 @@ function useKVState(nodeType) {
                 }
             }
         });
-        chainCallback(this, "onSerialize", function(info) {
+        IV2Z_chainCallback(this, "onSerialize", function(info) {
             info.widgets_values = {};
             if (!this.widgets) {
                 //object has no widgets, there is nothing to store
@@ -163,20 +163,20 @@ function useKVState(nodeType) {
         });
     })
 }
-var helpDOM;
+var IV2Z_helpDOM;
 if (!app.helpDOM) {
-    helpDOM = document.createElement("div");
-    app.VHSHelp = helpDOM
+    IV2Z_helpDOM = document.createElement("div");
+    app.IV2ZHelp = IV2Z_helpDOM
 }
-function initHelpDOM() {
+function IV2Z_initHelpDOM() {
     let parentDOM = document.createElement("div");
-    parentDOM.className = "VHS_floatinghelp"
+    parentDOM.className = "IV2Z_floatinghelp"
     document.body.appendChild(parentDOM)
-    parentDOM.appendChild(helpDOM)
-    helpDOM.className = "litegraph";
+    parentDOM.appendChild(IV2Z_helpDOM)
+    IV2Z_helpDOM.className = "litegraph";
     let scrollbarStyle = document.createElement('style');
     scrollbarStyle.innerHTML = `
-            .VHS_floatinghelp {
+            .IV2Z_floatinghelp {
                 scrollbar-width: 6px;
                 scrollbar-color: #0003  #0000;
                 &::-webkit-scrollbar {
@@ -191,17 +191,17 @@ function initHelpDOM() {
                     display: none;
                 }
             }
-            .VHS_loopedvideo::-webkit-media-controls-mute-button {
+            .IV2Z_loopedvideo::-webkit-media-controls-mute-button {
                 display:none;
             }
-            .VHS_loopedvideo::-webkit-media-controls-fullscreen-button {
+            .IV2Z_loopedvideo::-webkit-media-controls-fullscreen-button {
                 display:none;
             }
     `
     scrollbarStyle.id = 'scroll-properties'
     parentDOM.appendChild(scrollbarStyle)
-    chainCallback(app.canvas, "onDrawForeground", function (ctx, visible_rect){
-        let n = helpDOM.node
+    IV2Z_chainCallback(app.canvas, "onDrawForeground", function (ctx, visible_rect){
+        let n = IV2Z_helpDOM.node
         if (!n || !n?.graph) {
             parentDOM.style['left'] = '-5000px'
             return
@@ -234,7 +234,7 @@ function initHelpDOM() {
             display: 'inline',
         });
     });
-    function setCollapse(el, doCollapse) {
+    function IV2Z_setCollapse(el, doCollapse) {
         if (doCollapse) {
             el.children[0].children[0].innerHTML = '+'
             Object.assign(el.children[1].style, {
@@ -266,14 +266,14 @@ function initHelpDOM() {
             }
         }
     }
-    helpDOM.collapseOnClick = function() {
+    IV2Z_helpDOM.collapseOnClick = function() {
         let doCollapse = this.children[0].innerHTML == '-'
-        setCollapse(this.parentElement, doCollapse)
+        IV2Z_setCollapse(this.parentElement, doCollapse)
     }
-    helpDOM.selectHelp = function(name, value) {
+    IV2Z_helpDOM.selectHelp = function(name, value) {
         //attempt to navigate to name in help
-        function collapseUnlessMatch(items,t) {
-            var match = items.querySelector('[vhs_title="' + t + '"]')
+        function IV2Z_collapseUnlessMatch(items,t) {
+            var match = items.querySelector('[IV2Z_title="' + t + '"]')
             if (!match) {
                 for (let i of items.children) {
                     if (i.innerHTML.slice(0,t.length+5).includes(t)) {
@@ -293,26 +293,26 @@ function initHelpDOM() {
             //have no visual side effects
             match.scrollIntoView(false)
             window.scrollTo(0,0)
-            for (let i of items.querySelectorAll('.VHS_collapse')) {
+            for (let i of items.querySelectorAll('.IV2Z_collapse')) {
                 if (i.contains(match)) {
-                    setCollapse(i, false)
+                    IV2Z_setCollapse(i, false)
                 } else {
-                    setCollapse(i, true)
+                    IV2Z_setCollapse(i, true)
                 }
             }
             return match
         }
-        let target = collapseUnlessMatch(helpDOM, name)
+        let target = IV2Z_collapseUnlessMatch(IV2Z_helpDOM, name)
         if (target && value) {
-            collapseUnlessMatch(target, value)
+            IV2Z_collapseUnlessMatch(target, value)
         }
     }
     let titleContext = document.createElement("canvas").getContext("2d")
     titleContext.font = app.canvas.title_text_font;
-    helpDOM.calculateTitleLength = function(text) {
+    IV2Z_helpDOM.calculateTitleLength = function(text) {
         return titleContext.measureText(text).width
     }
-    helpDOM.addHelp = function(node, nodeType, description) {
+    IV2Z_helpDOM.addHelp = function(node, nodeType, description) {
         if (!description) {
             return
         }
@@ -323,13 +323,13 @@ function initHelpDOM() {
             if (!this.title) {
                 return size
             }
-            let title_width = helpDOM.calculateTitleLength(this.title)
+            let title_width = IV2Z_helpDOM.calculateTitleLength(this.title)
             size[0] = Math.max(size[0], title_width + LiteGraph.NODE_TITLE_HEIGHT*2)
             return size
         }
 
         node.description = description
-        chainCallback(node, "onDrawForeground", function (ctx) {
+        IV2Z_chainCallback(node, "onDrawForeground", function (ctx) {
             if (this?.flags?.collapsed) {
                 return
             }
@@ -339,40 +339,40 @@ function initHelpDOM() {
             ctx.fillText("?", this.size[0]-17, -8)
             ctx.restore()
         })
-        chainCallback(node, "onMouseDown", function (e, pos, canvas) {
+        IV2Z_chainCallback(node, "onMouseDown", function (e, pos, canvas) {
             if (this?.flags?.collapsed) {
                 return
             }
             //On click would be preferred, but this'll be good enough
             if (pos[1] < 0 && pos[0] + LiteGraph.NODE_TITLE_HEIGHT > this.size[0]) {
                 //corner question mark clicked
-                if (helpDOM.node == this) {
-                    helpDOM.node = undefined
+                if (IV2Z_helpDOM.node == this) {
+                    IV2Z_helpDOM.node = undefined
                 } else {
-                    helpDOM.node = this;
-                    helpDOM.innerHTML = this.description || "no help provided "
-                    for (let e of helpDOM.querySelectorAll('.VHS_collapse')) {
-                        e.children[0].onclick = helpDOM.collapseOnClick
+                    IV2Z_helpDOM.node = this;
+                    IV2Z_helpDOM.innerHTML = this.description || "no help provided "
+                    for (let e of IV2Z_helpDOM.querySelectorAll('.IV2Z_collapse')) {
+                        e.children[0].onclick = IV2Z_helpDOM.collapseOnClick
                         e.children[0].style.cursor = 'pointer'
                     }
-                    for (let e of helpDOM.querySelectorAll('.VHS_precollapse')) {
-                        setCollapse(e, true)
+                    for (let e of IV2Z_helpDOM.querySelectorAll('.IV2Z_precollapse')) {
+                        IV2Z_setCollapse(e, true)
                     }
-                    for (let e of helpDOM.querySelectorAll('.VHS_loopedvideo')) {
+                    for (let e of IV2Z_helpDOM.querySelectorAll('.IV2Z_loopedvideo')) {
                         e?.play()
                     }
-                    helpDOM.parentElement.scrollTo(0,0)
+                    IV2Z_helpDOM.parentElement.scrollTo(0,0)
                 }
                 return true
             }
         })
         let timeout = null
-        chainCallback(node, "onMouseMove", function (e, pos, canvas) {
+        IV2Z_chainCallback(node, "onMouseMove", function (e, pos, canvas) {
             if (timeout) {
                 clearTimeout(timeout)
                 timeout = null
             }
-            if (helpDOM.node != this) {
+            if (IV2Z_helpDOM.node != this) {
                 return
             }
             timeout = setTimeout(() => {
@@ -385,11 +385,11 @@ function initHelpDOM() {
                         let row = Math.floor((pos[1] - 7) / LiteGraph.NODE_SLOT_HEIGHT)
                         if (pos[0] < n.size[0]/2) {
                             if (row < n.inputs.length) {
-                                helpDOM.selectHelp(n.inputs[row].name)
+                                IV2Z_helpDOM.selectHelp(n.inputs[row].name)
                             }
                         } else {
                             if (row < n.outputs.length) {
-                                helpDOM.selectHelp(n.outputs[row].name)
+                                IV2Z_helpDOM.selectHelp(n.outputs[row].name)
                             }
                         }
                     } else {
@@ -404,7 +404,7 @@ function initHelpDOM() {
                                 wheight = w.computeSize(n.size[0])[1]
                             }
                             if (pos[1] < basey + wheight) {
-                                helpDOM.selectHelp(w.name, w.value)
+                                IV2Z_helpDOM.selectHelp(w.name, w.value)
                                 break
                             }
                             basey += wheight
@@ -413,7 +413,7 @@ function initHelpDOM() {
                 }
             }, 500)
         })
-        chainCallback(node, "onMouseLeave", function (e, pos, canvas) {
+        IV2Z_chainCallback(node, "onMouseLeave", function (e, pos, canvas) {
             if (timeout) {
                 clearTimeout(timeout)
                 timeout = null
@@ -422,11 +422,11 @@ function initHelpDOM() {
     }
 }
 
-function fitHeight(node) {
+function IV2Z_fitHeight(node) {
     node.setSize([node.size[0], node.computeSize([node.size[0], node.size[1]])[1]])
     node?.graph?.setDirtyCanvas(true);
 }
-function startDraggingItems(node, pointer) {
+function IV2Z_startDraggingItems(node, pointer) {
     app.canvas.emitBeforeChange()
     app.canvas.graph?.beforeChange()
     // Ensure that dragging is properly cleaned up, on success or failure.
@@ -438,23 +438,23 @@ function startDraggingItems(node, pointer) {
     app.canvas.processSelect(node, pointer.eDown, true)
     app.canvas.isDragging = true
 }
-function processDraggedItems(e) {
+function IV2Z_processDraggedItems(e) {
     if (e.shiftKey || LiteGraph.alwaysSnapToGrid)
       app.canvas?.graph?.snapToGrid(app.canvas.selectedItems)
     app.canvas.dirty_canvas = true
     app.canvas.dirty_bgcanvas = true
     app.canvas.onNodeMoved?.(findFirstNode(app.canvas.selectedItems))
 }
-function allowDragFromWidget(widget) {
+function IV2Z_allowDragFromWidget(widget) {
     widget.onPointerDown = function(pointer, node) {
-        pointer.onDragStart = () => startDraggingItems(node, pointer)
-        pointer.onDragEnd = processDraggedItems
+        pointer.onDragStart = () => IV2Z_startDraggingItems(node, pointer)
+        pointer.onDragEnd = IV2Z_processDraggedItems
         app.canvas.dirty_canvas = true
         return true
     }
 }
 
-async function uploadFile(file, progressCallback) {
+async function IV2Z_uploadFile(file, progressCallback) {
     try {
         // Wrap file in formdata so it includes filename
         const body = new FormData();
@@ -486,11 +486,11 @@ async function uploadFile(file, progressCallback) {
     }
 }
 
-function addVAEOutputToggle(nodeType, nodeData) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+function IV2Z_addVAEOutputToggle(nodeType, nodeData) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         this.reject_ue_connection = (input) => input?.name == "vae"
     })
-    chainCallback(nodeType.prototype, "onConnectionsChange", function(contype, slot, iscon, linfo) {
+    IV2Z_chainCallback(nodeType.prototype, "onConnectionsChange", function(contype, slot, iscon, linfo) {
         let slotType = this.inputs[slot]?.type
         if (contype == LiteGraph.INPUT && slotType == "VAE") {
             if (iscon && linfo) {
@@ -521,11 +521,11 @@ function addVAEOutputToggle(nodeType, nodeData) {
         }
     });
 }
-function addVAEInputToggle(nodeType, nodeData) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+function IV2Z_addVAEInputToggle(nodeType, nodeData) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         this.reject_ue_connection = (input) => input?.name == "vae"
     })
-    chainCallback(nodeType.prototype, "onConnectionsChange", function(contype, slot, iscon, linf) {
+    IV2Z_chainCallback(nodeType.prototype, "onConnectionsChange", function(contype, slot, iscon, linf) {
         if (contype == LiteGraph.INPUT && slot == 3 && this.inputs[3].type == "VAE") {
             if (iscon && linf) {
                 if (this.linkTimeout) {
@@ -554,8 +554,8 @@ function addVAEInputToggle(nodeType, nodeData) {
         }
     });
 }
-function cloneType(nodeType, nodeData) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+function IV2Z_cloneType(nodeType, nodeData) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         this.changeOutputType = function (new_type) {
             this.linkTimeout = setTimeout(() => {
                 this.linkTimeout = false
@@ -585,11 +585,11 @@ function cloneType(nodeType, nodeData) {
                 }
             }, 50)
         }
-        this.changeOutputType("VHS_DUMMY_NONE")
+        this.changeOutputType("IV2Z_DUMMY_NONE")
     });
-    chainCallback(nodeType.prototype, "onConnectionsChange", function(contype, slot, iscon, linf) {
+    IV2Z_chainCallback(nodeType.prototype, "onConnectionsChange", function(contype, slot, iscon, linf) {
         if (contype == LiteGraph.INPUT && slot == 0) {
-            let new_type = "VHS_DUMMY_NONE"
+            let new_type = "IV2Z_DUMMY_NONE"
             if (iscon && linf) {
                 new_type = app.graph.getNodeById(linf.origin_id).outputs[linf.origin_slot].type
             }
@@ -601,15 +601,15 @@ function cloneType(nodeType, nodeData) {
     });
 }
 
-function addDateFormatting(nodeType, field, timestamp_widget = false) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+function IV2Z_addDateFormatting(nodeType, field, timestamp_widget = false) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         const widget = this.widgets.find((w) => w.name === field);
         widget.serializeValue = () => {
             return applyTextReplacements(app, widget.value);
         };
     });
 }
-function addTimestampWidget(nodeType, nodeData, targetWidget) {
+function IV2Z_addTimestampWidget(nodeType, nodeData, targetWidget) {
     const newWidgets = {};
     for (let key in nodeData.input.required) {
         if (key == targetWidget) {
@@ -619,7 +619,7 @@ function addTimestampWidget(nodeType, nodeData, targetWidget) {
         newWidgets[key] = nodeData.input.required[key];
     }
     nodeDta.input.required = newWidgets;
-    chainCallback(nodeType.prototype, "onNodeCreated", function () {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function () {
         const directoryWidget = this.widgets.find((w) => w.name === "directory_name");
         const timestampWidget = this.widgets.find((w) => w.name === "timestamp_directory");
         directoryWidget.serializeValue = () => {
@@ -641,11 +641,11 @@ function addTimestampWidget(nodeType, nodeData, targetWidget) {
         });
     });
 }
-function initializeLoadFormat(nodeType, nodeData) {
+function IV2Z_initializeLoadFormat(nodeType, nodeData) {
     if (!nodeData?.input?.optional?.format) {
         return
     }
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         let node = this
         let formatWidget = this.widgets.find((w) => w.name === "format")
         formatWidget.options.formats = nodeData.input.optional.format[1].formats
@@ -657,7 +657,7 @@ function initializeLoadFormat(nodeType, nodeData) {
                base[widget.name] = widget.options
            }
         }
-        chainCallback(formatWidget, "callback", function(value) {
+        IV2Z_chainCallback(formatWidget, "callback", function(value) {
             let format = this.options.formats[value]
             if (!format) {
                 return
@@ -708,7 +708,7 @@ function initializeLoadFormat(nodeType, nodeData) {
         let rateWidget = this.widgets.find((w) => w.name === "force_rate")
         rateWidget.annotation = (value, width) => {
             if (value == 0 && this.video_query?.source?.fps != undefined) {
-                return roundToPrecision(this.video_query.source.fps, 2) + "\u21FD"
+                return IV2Z_roundToPrecision(this.video_query.source.fps, 2) + "\u21FD"
             }
         }
     });
@@ -717,11 +717,11 @@ function initializeLoadFormat(nodeType, nodeData) {
 function addUploadWidget(nodeType, nodeData, widgetName, type="video") {
     let accept = {'video': ["video/webm","video/mp4","video/x-matroska","image/gif"],
                   'audio': ["audio/mpeg","audio/wav","audio/x-wav","audio/ogg"]}
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         const node = this
         const pathWidget = this.widgets.find((w) => w.name === widgetName);
         const fileInput = document.createElement("input");
-        chainCallback(this, "onRemoved", () => {
+        IV2Z_chainCallback(this, "onRemoved", () => {
             fileInput?.remove();
         });
         if (type == "folder") {
@@ -743,7 +743,7 @@ function addUploadWidget(nodeType, nodeData, widgetName, type="video") {
                     let successes = 0;
                     const onProg = (p) => this.progress = (successes + p) / fileInput.files.length
                     for(const file of fileInput.files) {
-                        if ((await uploadFile(file, onProg)).status == 200) {
+                        if ((await IV2Z_uploadFile(file, onProg)).status == 200) {
                             successes++;
                         } else {
                             this.progress = undefined
@@ -769,7 +769,7 @@ function addUploadWidget(nodeType, nodeData, widgetName, type="video") {
             let accept = {'video': ["video/webm","video/mp4","video/x-matroska","image/gif"],
                           'audio': ["audio/mpeg","audio/wav","audio/x-wav","audio/ogg"]}[type]
             async function doUpload(file) {
-                let resp = await uploadFile(file, (p) => node.progress = p)
+                let resp = await IV2Z_uploadFile(file, (p) => node.progress = p)
                 node.progress = undefined
                 if (resp.status != 200) {
                     return false
@@ -818,7 +818,7 @@ function addUploadWidget(nodeType, nodeData, widgetName, type="video") {
     });
 }
 function addAudioPreview(nodeType, isInput=true) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         var element = document.createElement("audio");
         element.controls = true
         const previewNode = this;
@@ -845,7 +845,7 @@ function addAudioPreview(nodeType, isInput=true) {
             }
             Object.assign(previewWidget.value.params, params)
             if (!force_update &&
-                app.ui.settings.getSettingValue("VHS.AdvancedPreviews") == 'Never') {
+                app.ui.settings.getSettingValue("IV2Z.AdvancedPreviews") == 'Never') {
                 return;
             }
             if (timeout) {
@@ -862,7 +862,7 @@ function addAudioPreview(nodeType, isInput=true) {
                 return;
             }
             let params =  {}
-            let advp = app.ui.settings.getSettingValue("VHS.AdvancedPreviews")
+            let advp = app.ui.settings.getSettingValue("IV2Z.AdvancedPreviews")
             if (advp == 'Never') {
                 advp = false
             } else if (advp == 'Input Only') {
@@ -875,8 +875,8 @@ function addAudioPreview(nodeType, isInput=true) {
             if (!advp) {
                 element.src = api.apiURL('/view?' + new URLSearchParams(params));
             } else {
-                params.deadline = app.ui.settings.getSettingValue("VHS.AdvancedPreviewsDeadline")
-                element.src = api.apiURL('/vhs/viewaudio?' + new URLSearchParams(params));
+                params.deadline = app.ui.settings.getSettingValue("IV2Z.AdvancedPreviewsDeadline")
+                element.src = api.apiURL('/IV2Z/viewaudio?' + new URLSearchParams(params));
             }
         }
         previewWidget.callback = previewWidget.updateSource
@@ -895,9 +895,9 @@ function addAudioPreview(nodeType, isInput=true) {
         for (let widget of this.widgets) {
             if (widget.name in widgetMap) {
                 if (typeof(widgetMap[widget.name]) == 'function') {
-                    chainCallback(widget, "callback", widgetMap[widget.name]);
+                    IV2Z_chainCallback(widget, "callback", widgetMap[widget.name]);
                 } else {
-                    chainCallback(widget, "callback", update(widgetMap[widget.name]))
+                    IV2Z_chainCallback(widget, "callback", update(widgetMap[widget.name]))
                 }
             }
             if (widget.type != "button") {
@@ -907,8 +907,8 @@ function addAudioPreview(nodeType, isInput=true) {
     });
 }
 
-function addVideoPreview(nodeType, isInput=true) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+function IV2Z_addVideoPreview(nodeType, isInput=true) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         var element = document.createElement("div");
         const previewNode = this;
         var previewWidget = this.addDOMWidget("videopreview", "preview", element, {
@@ -921,7 +921,7 @@ function addVideoPreview(nodeType, isInput=true) {
                 element.value = v;
             },
         });
-        allowDragFromWidget(previewWidget)
+        IV2Z_allowDragFromWidget(previewWidget)
         previewWidget.computeSize = function(width) {
             if (this.aspectRatio && !this.parentEl.hidden) {
                 let height = (previewNode.size[0]-20)/ this.aspectRatio + 10;
@@ -960,9 +960,9 @@ function addVideoPreview(nodeType, isInput=true) {
             app.dragOverNode = this
         })
         previewWidget.value = {hidden: false, paused: false, params: {},
-            muted: app.ui.settings.getSettingValue("VHS.DefaultMute")}
+            muted: app.ui.settings.getSettingValue("IV2Z.DefaultMute")}
         previewWidget.parentEl = document.createElement("div");
-        previewWidget.parentEl.className = "vhs_preview";
+        previewWidget.parentEl.className = "IV2Z_preview";
         previewWidget.parentEl.style['width'] = "100%"
         element.appendChild(previewWidget.parentEl);
         previewWidget.videoEl = document.createElement("video");
@@ -973,12 +973,12 @@ function addVideoPreview(nodeType, isInput=true) {
         previewWidget.videoEl.addEventListener("loadedmetadata", () => {
 
             previewWidget.aspectRatio = previewWidget.videoEl.videoWidth / previewWidget.videoEl.videoHeight;
-            fitHeight(this);
+            IV2Z_fitHeight(this);
         });
         previewWidget.videoEl.addEventListener("error", () => {
             //TODO: consider a way to properly notify the user why a preview isn't shown.
             previewWidget.parentEl.hidden = true;
-            fitHeight(this);
+            IV2Z_fitHeight(this);
         });
         previewWidget.videoEl.onmouseenter =  () => {
             previewWidget.videoEl.muted = previewWidget.value.muted
@@ -992,7 +992,7 @@ function addVideoPreview(nodeType, isInput=true) {
         previewWidget.imgEl.hidden = true;
         previewWidget.imgEl.onload = () => {
             previewWidget.aspectRatio = previewWidget.imgEl.naturalWidth / previewWidget.imgEl.naturalHeight;
-            fitHeight(this);
+            IV2Z_fitHeight(this);
         };
         previewWidget.parentEl.appendChild(previewWidget.videoEl)
         previewWidget.parentEl.appendChild(previewWidget.imgEl)
@@ -1006,7 +1006,7 @@ function addVideoPreview(nodeType, isInput=true) {
             }
             Object.assign(previewWidget.value.params, params)
             if (!force_update &&
-                app.ui.settings.getSettingValue("VHS.AdvancedPreviews") == 'Never') {
+                app.ui.settings.getSettingValue("IV2Z.AdvancedPreviews") == 'Never') {
                 return;
             }
             if (timeout) {
@@ -1023,7 +1023,7 @@ function addVideoPreview(nodeType, isInput=true) {
                 return;
             }
             let params =  {}
-            let advp = app.ui.settings.getSettingValue("VHS.AdvancedPreviews")
+            let advp = app.ui.settings.getSettingValue("IV2Z.AdvancedPreviews")
             if (advp == 'Never') {
                 advp = false
             } else if (advp == 'Input Only') {
@@ -1043,7 +1043,7 @@ function addVideoPreview(nodeType, isInput=true) {
                     this.videoEl.src = api.apiURL('/view?' + new URLSearchParams(params));
                 } else {
                     let target_width = (previewNode.size[0]-20)*2 || 256;
-                    let minWidth = app.ui.settings.getSettingValue("VHS.AdvancedPreviewsMinWidth")
+                    let minWidth = app.ui.settings.getSettingValue("IV2Z.AdvancedPreviewsMinWidth")
                     if (target_width < minWidth) {
                         target_width = minWidth
                     }
@@ -1053,8 +1053,8 @@ function addVideoPreview(nodeType, isInput=true) {
                         let ar = params.custom_width/params.custom_height
                         params.force_size = target_width+"x"+(target_width/ar)
                     }
-                    params.deadline = app.ui.settings.getSettingValue("VHS.AdvancedPreviewsDeadline")
-                    this.videoEl.src = api.apiURL('/vhs/viewvideo?' + new URLSearchParams(params));
+                    params.deadline = app.ui.settings.getSettingValue("IV2Z.AdvancedPreviewsDeadline")
+                    this.videoEl.src = api.apiURL('/IV2Z/viewvideo?' + new URLSearchParams(params));
                 }
                 this.videoEl.hidden = false;
                 this.imgEl.hidden = true;
@@ -1069,7 +1069,7 @@ function addVideoPreview(nodeType, isInput=true) {
                 if (!previewWidget?.value?.params?.filename) {
                     return
                 }
-                let qurl = api.apiURL('/vhs/queryvideo?' + new URLSearchParams(previewWidget.value.params))
+                let qurl = api.apiURL('/IV2Z/queryvideo?' + new URLSearchParams(previewWidget.value.params))
                 let query = undefined
                 try {
                     let query_res = await fetch(qurl)
@@ -1086,9 +1086,9 @@ function addVideoPreview(nodeType, isInput=true) {
         previewWidget.parentEl.appendChild(previewWidget.imgEl)
     });
 }
-let copiedPath = undefined
-function addPreviewOptions(nodeType) {
-    chainCallback(nodeType.prototype, "getExtraMenuOptions", function(_, options) {
+let IV2Z_copiedPath = undefined
+function IV2Z_addPreviewOptions(nodeType) {
+    IV2Z_chainCallback(nodeType.prototype, "getExtraMenuOptions", function(_, options) {
         // The intended way of appending options is returning a list of extra options,
         // but this isn't used in widgetInputs.js and would require
         // less generalization of chainCallback
@@ -1134,7 +1134,7 @@ function addPreviewOptions(nodeType) {
                 }
             );
             if (previewWidget.value.params.fullpath) {
-                copiedPath = previewWidget.value.params.fullpath
+                IV2Z_copiedPath = previewWidget.value.params.fullpath
                 const blob = new Blob([previewWidget.value.params.fullpath],
                     { type: 'text/plain'})
                 optNew.push({
@@ -1189,13 +1189,13 @@ function addPreviewOptions(nodeType) {
             }
             previewWidget.value.hidden = !previewWidget.value.hidden;
             previewWidget.parentEl.hidden = previewWidget.value.hidden;
-            fitHeight(this);
+            IV2Z_fitHeight(this);
 
         }});
         optNew.push({content: "Sync preview", callback: () => {
             //TODO: address case where videos have varying length
             //Consider a system of sync groups which are opt-in?
-            for (let p of document.getElementsByClassName("vhs_preview")) {
+            for (let p of document.getElementsByClassName("IV2Z_preview")) {
                 for (let child of p.children) {
                     if (child.tagName == "VIDEO") {
                         child.currentTime=0;
@@ -1215,8 +1215,8 @@ function addPreviewOptions(nodeType) {
         options.unshift(...optNew);
     });
 }
-function addFormatWidgets(nodeType, nodeData) {
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+function IV2Z_addFormatWidgets(nodeType, nodeData) {
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         var formatWidget = null;
         var formatWidgetIndex = -1;
         for(let i = 0; i < this.widgets.length; i++) {
@@ -1227,7 +1227,7 @@ function addFormatWidgets(nodeType, nodeData) {
             }
         }
         let formatWidgetsCount = 0;
-        chainCallback(formatWidget, "callback", (value) => {
+        IV2Z_chainCallback(formatWidget, "callback", (value) => {
             const formats = (LiteGraph.registered_node_types[this.type]
                 ?.nodeData?.input?.required?.format?.[1]?.formats)
             let newWidgets = [];
@@ -1268,16 +1268,16 @@ function addFormatWidgets(nodeType, nodeData) {
                     this.addInput(w.name, w.config[0], {widget: {name: w.name}})
                 }
             }
-            fitHeight(this);
+            IV2Z_fitHeight(this);
             formatWidgetsCount = newWidgets.length;
         });
     });
 }
 function addLoadCommon(nodeType, nodeData) {
-    addVideoPreview(nodeType);
-    initializeLoadFormat(nodeType, nodeData)
-    addPreviewOptions(nodeType);
-    chainCallback(nodeType.prototype, "onNodeCreated", function() {
+    IV2Z_addVideoPreview(nodeType);
+    IV2Z_initializeLoadFormat(nodeType, nodeData)
+    IV2Z_addPreviewOptions(nodeType);
+    IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function() {
         //widget.callback adds unused arguements which need culling
         const node = this
         function update(key) {
@@ -1319,9 +1319,9 @@ function addLoadCommon(nodeType, nodeData) {
         for (let widget of this.widgets) {
             if (widget.name in widgetMap) {
                 if (typeof(widgetMap[widget.name]) == 'function') {
-                    chainCallback(widget, "callback", widgetMap[widget.name]);
+                    IV2Z_chainCallback(widget, "callback", widgetMap[widget.name]);
                 } else {
-                    chainCallback(widget, "callback", update(widgetMap[widget.name]))
+                    IV2Z_chainCallback(widget, "callback", update(widgetMap[widget.name]))
                 }
             }
             if (widget.type != "button") {
@@ -1331,14 +1331,14 @@ function addLoadCommon(nodeType, nodeData) {
     });
 }
 
-function path_stem(path) {
+function IV2Z_path_stem(path) {
     let i = path.lastIndexOf("/");
     if (i >= 0) {
         return [path.slice(0,i+1),path.slice(i+1)];
     }
     return ["",path];
 }
-function searchBox(event, [x,y], node) {
+function IV2Z_searchBox(event, [x,y], node) {
     //Ensure only one dialogue shows at a time
     if (this.prompt)
         return;
@@ -1362,7 +1362,7 @@ function searchBox(event, [x,y], node) {
 
     var timeout = null;
     let last_path = null;
-    let extensions = pathWidget.options.vhs_path_extensions
+    let extensions = pathWidget.options.IV2Z_path_extensions
 
     input.addEventListener("keydown", (e) => {
         dialog.is_modified = true;
@@ -1384,7 +1384,7 @@ function searchBox(event, [x,y], node) {
             } else if (e.ctrlKey && (e.keyCode == 87 || e.keyCode == 66)) {
                 //Ctrl+w or Ctrl+b
                 //most browsers won't support, but it's good QOL for those that do
-                input.value = path_stem(input.value.slice(0,-1))[0]
+                input.value = IV2Z_path_stem(input.value.slice(0,-1))[0]
                 e.preventDefault();
                 e.stopPropagation();
             } else if (e.ctrlKey && e.keyCode == 71) {
@@ -1461,14 +1461,14 @@ function searchBox(event, [x,y], node) {
     }
     async function updateOptions() {
         timeout = null;
-        let [path, remainder] = path_stem(input.value);
+        let [path, remainder] = IV2Z_path_stem(input.value);
         if (last_path != path) {
             //fetch options.  Must block execution here, so update should be async?
             let params = {path : path}
             if (extensions) {
                 params.extensions = extensions
             }
-            let optionsURL = api.apiURL('/vhs/getpath?' + new URLSearchParams(params));
+            let optionsURL = api.apiURL('/IV2Z/getpath?' + new URLSearchParams(params));
             try {
                 let resp = await fetch(optionsURL);
                 options = await resp.json();
@@ -1497,7 +1497,7 @@ function searchBox(event, [x,y], node) {
 
     return dialog;
 }
-function button_action(widget) {
+function IV2Z_button_action(widget) {
   if (
     widget.options?.reset == undefined &&
     widget.options?.disable == undefined
@@ -1534,7 +1534,7 @@ function fitText(ctx, text, maxLength) {
     let shortened = text.slice(0, Math.max(0, cutoff - 2)) + '…'
     return [shortened, ctx.measureText(shortened).width]
 }
-function fitPath(ctx, path, maxLength) {
+function IV2Z_fitPath(ctx, path, maxLength) {
     let fullLength = ctx.measureText(path).width
     if (fullLength < maxLength) {
         return [path, fullLength]
@@ -1543,7 +1543,7 @@ function fitPath(ctx, path, maxLength) {
     let len = (maxLength / fullLength * path.length | 0) - 1
 
     let displayPath = ''
-    let filename = path_stem(path)[1]
+    let filename = IV2Z_path_stem(path)[1]
     if (filename.length > len-2) {
         //may all fit, but can't squeeze more info
          displayPath = filename.substr(0,len);
@@ -1561,7 +1561,7 @@ function fitPath(ctx, path, maxLength) {
     }
     return [displayPath, ctx.measureText(displayPath).width]
 }
-function roundToPrecision(num, precision) {
+function IV2Z_roundToPrecision(num, precision) {
     let strnum = Number(num).toFixed(precision)
     let deci = strnum.indexOf('.')
     if (deci > 0) {
@@ -1576,7 +1576,7 @@ function roundToPrecision(num, precision) {
     }
     return strnum
 }
-function inner_value_change(widget, value, node, pos) {
+function IV2Z_inner_value_change(widget, value, node, pos) {
   widget.value = value
   if (widget.options?.property && widget.options.property in node.properties) {
     node.setProperty(widget.options.property, value)
@@ -1585,7 +1585,7 @@ function inner_value_change(widget, value, node, pos) {
     widget.callback(widget.value, app.canvas, node, event)
   }
 }
-function drawAnnotated(ctx, node, widget_width, y, H) {
+function IV2Z_drawAnnotated(ctx, node, widget_width, y, H) {
   const litegraph_base = LiteGraph
   const show_text = app.canvas.ds.scale >= (app.canvas.low_quality_zoom_threshold ?? 0.5)
   const margin = 15
@@ -1598,7 +1598,7 @@ function drawAnnotated(ctx, node, widget_width, y, H) {
   ctx.fill()
   if (show_text) {
     if (!this.disabled) ctx.stroke()
-    const button = button_action(this)
+    const button = IV2Z_button_action(this)
     if (button != 'None') {
       ctx.save()
       if (button.startsWith('No ')) {
@@ -1686,7 +1686,7 @@ function drawAnnotated(ctx, node, widget_width, y, H) {
     }
   }
 }
-function mouseAnnotated(event, [x, y], node) {
+function IV2Z_mouseAnnotated(event, [x, y], node) {
     //NOTE: Mouse actions contain no history element.
     //This can cause overlapping actions since each triggers on different event type (down/move/up)
     //TODO: Consider further rework
@@ -1712,7 +1712,7 @@ function mouseAnnotated(event, [x, y], node) {
             this.value = this.options.max
         }
     } else if (event.type == 'pointerdown') {
-        const buttonType = button_action(this)
+        const buttonType = IV2Z_button_action(this)
         if (isButton == 2) {
             if (buttonType == 'Reset') {
                 this.value = this.options.reset
@@ -1733,7 +1733,7 @@ function mouseAnnotated(event, [x, y], node) {
         if (event.click_time < 200 && !isButton) {
             const d_callback = (v) => {
                 this.value = this.parseValue?.(v) ?? Number(v)
-                inner_value_change(this, this.value, node, [x, y])
+                IV2Z_inner_value_change(this, this.value, node, [x, y])
             }
             const dialog = app.canvas.prompt(
                 'Value',
@@ -1754,7 +1754,7 @@ function mouseAnnotated(event, [x, y], node) {
                         i--
                     else
                         i++
-                    if (node.widgets[i]?.type == "VHS.ANNOTATED") {//restrict to annotatedNUmbers
+                    if (node.widgets[i]?.type == "IV2Z.ANNOTATED") {//restrict to annotatedNUmbers
                         node.widgets[i]?.mouse(event, [x, y+24], node)
                     }
                 }
@@ -1765,18 +1765,18 @@ function mouseAnnotated(event, [x, y], node) {
     if (old_value != this.value)
         setTimeout(
             function () {
-                inner_value_change(this, this.value, node, [x, y])
+                IV2Z_inner_value_change(this, this.value, node, [x, y])
             }.bind(this),
             20
         )
     return true
 }
-let latentPreviewNodes = new Set()
+let IV2Z_latentPreviewNodes = new Set()
 app.registerExtension({
-    name: "VideoHelperSuite.Core",
+    name: "IV2Z_VideoHelperSuite.Core",
     settings: [
       {
-        id: 'VHS.AdvancedPreviews',
+        id: 'IV2Z.AdvancedPreviews',
         category: ['🎥🅥🅗🅢', 'Previews', 'Advanced Previews'],
         name: 'Advanced Previews',
         tooltip: 'Automatically transcode previews on request. Required for advanced functionality',
@@ -1785,7 +1785,7 @@ app.registerExtension({
         defaultValue: 'Input Only',
       },
       {
-        id: 'VHS.AdvancedPreviewsMinWidth',
+        id: 'IV2Z.AdvancedPreviewsMinWidth',
         category: ['🎥🅥🅗🅢', 'Previews', 'Min Width'],
         name: 'Minimum preview width',
         tooltip: 'Advanced previews have their resolution downscaled to the node size for performance. While a node can be resized to increase preview quality, a minimum width can be set that previews won\'t be downscaled beneath. Preveiws will never be upscaled, so this can safely be set large.',
@@ -1798,7 +1798,7 @@ app.registerExtension({
         defaultValue: 0,
       },
       {
-        id: 'VHS.AdvancedPreviewsDeadline',
+        id: 'IV2Z.AdvancedPreviewsDeadline',
         category: ['🎥🅥🅗🅢', 'Previews', 'Deadline'],
         name: 'Deadline',
         tooltip: 'Determines how much time can be spent when encoding advanced previews. Realtime results in reduced quality, but good will likely cause the preview to stutter as initial generation occurs',
@@ -1807,14 +1807,14 @@ app.registerExtension({
         defaultValue: 'realtime',
       },
       {
-        id: 'VHS.AdvancedPreviewsDefaultMute',
+        id: 'IV2Z.AdvancedPreviewsDefaultMute',
         category: ['🎥🅥🅗🅢', 'Previews', 'Default Mute'],
         name: 'Mute videos by default',
         type: 'boolean',
         defaultValue: false,
       },
       {
-        id: 'VHS.LatentPreview',
+        id: 'IV2Z.LatentPreview',
         category: ['🎥🅥🅗🅢', 'Sampling', 'Latent Previews'],
         name: 'Display animated previews when sampling',
         type: 'boolean',
@@ -1822,19 +1822,19 @@ app.registerExtension({
         onChange(value) {
             if (!value) {
                 //Remove any previewWidgets
-                for (let id of latentPreviewNodes) {
+                for (let id of IV2Z_latentPreviewNodes) {
                     let n = app.graph.getNodeById(id)
-                    let i = n?.widgets?.findIndex((w) => w.name == 'vhslatentpreview')
+                    let i = n?.widgets?.findIndex((w) => w.name == 'IV2Zlatentpreview')
                     if (i >= 0) {
                         n.widgets.splice(i,1)[0].onRemove()
                     }
                 }
-                latentPreviewNodes = new Set()
+                IV2Z_latentPreviewNodes = new Set()
             }
         },
       },
       {
-        id: "VHS.LatentPreviewRate",
+        id: "IV2Z.LatentPreviewRate",
         category: ['🎥🅥🅗🅢', 'Sampling', 'Latent Preview Rate'],
         name: "Playback rate override.",
         type: 'number',
@@ -1848,14 +1848,14 @@ app.registerExtension({
         defaultValue: 0,
       },
       {
-        id: 'VHS.MetadataImage',
+        id: 'IV2Z.MetadataImage',
         category: ['🎥🅥🅗🅢', 'Output', 'MetadataImage'],
         name: 'Save png of first frame for metadata',
         type: 'boolean',
         defaultValue: true,
       },
       {
-        id: 'VHS.KeepIntermediate',
+        id: 'IV2Z.KeepIntermediate',
         category: ['🎥🅥🅗🅢', 'Output', 'Keep Intermediate'],
         name: 'Keep required intermediate files after sucessful execution',
         type: 'boolean',
@@ -1864,8 +1864,8 @@ app.registerExtension({
     ],
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if(nodeData?.name?.startsWith("VHS_")) {
-            useKVState(nodeType);
+        if(nodeData?.name?.startsWith("IV2Z_")) {
+            IV2Z_useKVState(nodeType);
             if (nodeData.description) {
                 let description = nodeData.description
                 let el = document.createElement("div")
@@ -1876,23 +1876,23 @@ app.registerExtension({
                     nodeData.description = chunks[0]
                     description = chunks.join('<br>')
                 } else {
-                    nodeData.description = el.querySelector('#VHS_shortdesc')?.innerHTML || el.children[1]?.firstChild?.innerHTML
+                    nodeData.description = el.querySelector('#IV2Z_shortdesc')?.innerHTML || el.children[1]?.firstChild?.innerHTML
                 }
-                chainCallback(nodeType.prototype, "onNodeCreated", function () {
-                    helpDOM.addHelp(this, nodeType, description)
+                IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function () {
+                    IV2Z_helpDOM.addHelp(this, nodeType, description)
                     this.setSize(this.computeSize())
                 })
             }
-            //set widgetType to use VHS widgets where possible
+            //set widgetType to use IV2Z widgets where possible
             for(let inp of Object.values({...nodeData.input?.required, ...nodeData.input?.optional})) {
                 if (["INT", "FLOAT"].includes(inp[0])) {
                     if (!inp[1]) {
                         inp[1] = {}
                     }
-                    inp[1].widgetType ??= "VHS" + inp[0]
+                    inp[1].widgetType ??= "IV2Z" + inp[0]
                 }
             }
-            chainCallback(nodeType.prototype, "onNodeCreated", function () {
+            IV2Z_chainCallback(nodeType.prototype, "onNodeCreated", function () {
                 let new_widgets = []
                 if (this.widgets) {
                     for (let w of this.widgets) {
@@ -1901,8 +1901,8 @@ app.registerExtension({
                         if (!config) {
                             continue
                         }
-                        if (w?.type == "text" && config[1].vhs_path_extensions) {
-                            new_widgets.push(app.widgets.VHSPATH({}, w.name, ["VHSPATH", config[1]]));
+                        if (w?.type == "text" && config[1].IV2Z_path_extensions) {
+                            new_widgets.push(app.widgets.IV2ZPATH({}, w.name, ["IV2ZPATH", config[1]]));
                         } else {
                             new_widgets.push(w)
                         }
@@ -1927,25 +1927,25 @@ app.registerExtension({
                 }
             });
         }
-        if (nodeData?.name == "VHS_VideoCombine") {
-            addDateFormatting(nodeType, "filename_prefix");
-            chainCallback(nodeType.prototype, "onExecuted", function(message) {
+        if (nodeData?.name == "IV2Z_VideoCombine") {
+            IV2Z_addDateFormatting(nodeType, "filename_prefix");
+            IV2Z_chainCallback(nodeType.prototype, "onExecuted", function(message) {
                 if (message?.gifs) {
                     this.updateParameters(message.gifs[0], true);
                 }
             });
-            addVideoPreview(nodeType, false);
-            addPreviewOptions(nodeType);
-            addFormatWidgets(nodeType, nodeData);
-            addVAEInputToggle(nodeType, nodeData)
+            IV2Z_addVideoPreview(nodeType, false);
+            IV2Z_addPreviewOptions(nodeType);
+            IV2Z_addFormatWidgets(nodeType, nodeData);
+            IV2Z_addVAEInputToggle(nodeType, nodeData)
         }
     },
     async getCustomWidgets() {
         return {
-            VHSPATH(node, inputName, inputData) {
+            IV2ZPATH(node, inputName, inputData) {
                 let w = {
                     name : inputName,
-                    type : "VHS.PATH",
+                    type : "IV2Z.PATH",
                     value : "",
                     draw : function(ctx, node, widget_width, y, H) {
                         //Adapted from litegraph.core.js:drawNodeWidgets
@@ -1981,12 +1981,12 @@ app.registerExtension({
                             }
                             ctx.fillStyle = this.value ? text_color : '#777';
                             ctx.textAlign = "right";
-                            let disp_text = fitPath(ctx, String(this.value || this.options.placeholder), freeWidth)[0]
+                            let disp_text = IV2Z_fitPath(ctx, String(this.value || this.options.placeholder), freeWidth)[0]
                             ctx.fillText(disp_text, widget_width - margin * 2, y + H * 0.7);
                             ctx.restore();
                         }
                     },
-                    mouse : searchBox,
+                    mouse : IV2Z_searchBox,
                     options : {},
                 };
                 if (inputData.length > 1) {
@@ -2002,13 +2002,13 @@ app.registerExtension({
                 node.widgets.push(w);
                 return w;
             },
-            VHSFLOAT(node, inputName, inputData) {
+            IV2ZFLOAT(node, inputName, inputData) {
                 let w = {
                     name: inputName,
-                    type: "VHS.ANNOTATED",
+                    type: "IV2Z.ANNOTATED",
                     value: inputData[1]?.default ?? 0,
-                    draw: drawAnnotated,
-                    mouse: mouseAnnotated,
+                    draw: IV2Z_drawAnnotated,
+                    mouse: IV2Z_mouseAnnotated,
                     computeSize(width) {
                         return [width, 20]
                     },
@@ -2028,7 +2028,7 @@ app.registerExtension({
                     },
                     config: inputData,
                     displayValue: function() {
-                        return roundToPrecision(this.value, this.options.precision ?? 3)
+                        return IV2Z_roundToPrecision(this.value, this.options.precision ?? 3)
                     },
                     options: Object.assign({},  inputData[1])
                 }
@@ -2038,13 +2038,13 @@ app.registerExtension({
                 node.widgets.push(w)
                 return w
             },
-            VHSINT(node, inputName, inputData) {
+            IV2ZINT(node, inputName, inputData) {
                 let w = {
                     name: inputName,
-                    type: "VHS.ANNOTATED",
+                    type: "IV2Z.ANNOTATED",
                     value: inputData[1]?.default ?? 0,
-                    draw: drawAnnotated,
-                    mouse: mouseAnnotated,
+                    draw: IV2Z_drawAnnotated,
+                    mouse: IV2Z_mouseAnnotated,
                     computeSize(width) {
                         return [width, 20]
                     },
@@ -2074,13 +2074,13 @@ app.registerExtension({
                 node.widgets.push(w)
                 return w
             },
-            VHSTIMESTAMP(node, inputName, inputData) {
+            IV2ZTIMESTAMP(node, inputName, inputData) {
                 let w = {
                     name: inputName,
-                    type: "VHS.TIMESTAMP",
+                    type: "IV2Z.TIMESTAMP",
                     value: inputData[1]?.default ?? 0,
-                    draw: drawAnnotated,
-                    mouse: mouseAnnotated,
+                    draw: IV2Z_drawAnnotated,
+                    mouse: IV2Z_mouseAnnotated,
                     computeSize(width) {
                         return [width, 20]
                     },
@@ -2112,7 +2112,7 @@ app.registerExtension({
                             }
                             display += minutes + ":"
                         }
-                        seconds = roundToPrecision(seconds, 4)
+                        seconds = IV2Z_roundToPrecision(seconds, 4)
                         if ((seconds[1] == '.' || seconds.length == 1) && (minutes > 0 || hours > 0)) {
                             seconds = '0'+seconds
                         }
@@ -2130,7 +2130,7 @@ app.registerExtension({
     },
     async loadedGraphNode(node) {
         //Check and migrate inputs named batch_manager from old workflows
-        if (node.type?.startsWith("VHS_") && node.inputs) {
+        if (node.type?.startsWith("IV2Z_") && node.inputs) {
             const batchInput = node.inputs.find((i) => i.name == "batch_manager")
             if (batchInput) {
                 batchInput.name = "meta_batch"
@@ -2138,18 +2138,18 @@ app.registerExtension({
         }
     },
     async beforeConfigureGraph(graphData, missingNodeTypes) {
-        if(helpDOM?.node) {
-            helpDOM.node = undefined
+        if(IV2Z_helpDOM?.node) {
+            IV2Z_helpDOM.node = undefined
         }
     },
     async setup() {
         let originalGraphToPrompt = app.graphToPrompt
         let graphToPrompt = async function() {
             let res = await originalGraphToPrompt.apply(this, arguments);
-            res.workflow.extra['VHS_latentpreview'] = app.ui.settings.getSettingValue("VHS.LatentPreview")
-            res.workflow.extra['VHS_latentpreviewrate'] = app.ui.settings.getSettingValue("VHS.LatentPreviewRate")
-            res.workflow.extra['VHS_MetadataImage'] = app.ui.settings.getSettingValue("VHS.MetadataImage")
-            res.workflow.extra['VHS_KeepIntermediate'] = app.ui.settings.getSettingValue("VHS.KeepIntermediate")
+            res.workflow.extra['IV2Z_latentpreview'] = app.ui.settings.getSettingValue("IV2Z.LatentPreview")
+            res.workflow.extra['IV2Z_latentpreviewrate'] = app.ui.settings.getSettingValue("IV2Z.LatentPreviewRate")
+            res.workflow.extra['IV2Z_MetadataImage'] = app.ui.settings.getSettingValue("IV2Z.MetadataImage")
+            res.workflow.extra['IV2Z_KeepIntermediate'] = app.ui.settings.getSettingValue("IV2Z.KeepIntermediate")
             return res
         }
         app.graphToPrompt = graphToPrompt
@@ -2168,9 +2168,9 @@ app.registerExtension({
                     break
                 }
             }
-            if (filepath && copiedPath == filepath) {
+            if (filepath && IV2Z_copiedPath == filepath) {
                 //Add a Load Video (Path) and populate filepath
-                const pastedNode = LiteGraph.createNode('VHS_LoadVideoPath')
+                const pastedNode = LiteGraph.createNode('IV2Z_LoadVideoPath')
                 app.canvas.graph.add(pastedNode)
                 pastedNode.pos[0] = app.canvas.graph_mouse[0]
                 pastedNode.pos[1] = app.canvas.graph_mouse[1]
@@ -2179,14 +2179,14 @@ app.registerExtension({
             } else if (video && false) {
                 //Disabled due to lack of testing
                 //Add a Load Video (Upload), then upload the file, then select the file
-                const pastedNode = LiteGraph.createNode('VHS_LoadVideo')
+                const pastedNode = LiteGraph.createNode('IV2Z_LoadVideo')
                 app.canvas.graph.add(pastedNode)
                 pastedNode.pos[0] = app.canvas.graph_mouse[0]
                 pastedNode.pos[1] = app.canvas.graph_mouse[1]
                 const pathWidget = pastedNode.widgets[0]
                 //TODO: upload to pasted dir?
                 const blob = video.getAsFile()
-                const resp = await uploadFile(blob)
+                const resp = await IV2Z_uploadFile(blob)
                 if (resp.status != 200) {
                     //upload failed and file can not be added to options
                     return;
@@ -2204,22 +2204,22 @@ app.registerExtension({
         }, true)
     },
     async init() {
-        if (app.ui.settings.getSettingValue("VHS.AdvancedPreviews") == true) {
-            app.ui.settings.setSettingValue("VHS.AdvancedPreviews", 'Always')
+        if (app.ui.settings.getSettingValue("IV2Z.AdvancedPreviews") == true) {
+            app.ui.settings.setSettingValue("IV2Z.AdvancedPreviews", 'Always')
         }
-        if (app.ui.settings.getSettingValue("VHS.AdvancedPreviews") == false) {
-            app.ui.settings.setSettingValue("VHS.AdvancedPreviews", 'Never')
+        if (app.ui.settings.getSettingValue("IV2Z.AdvancedPreviews") == false) {
+            app.ui.settings.setSettingValue("IV2Z.AdvancedPreviews", 'Never')
         }
-        if (app.VHSHelp != helpDOM) {
-            helpDOM = app.VHSHelp
+        if (app.IV2ZHelp != IV2Z_helpDOM) {
+            IV2Z_helpDOM = app.IV2ZHelp
         } else {
-            initHelpDOM()
+            IV2Z_initHelpDOM()
         }
         let e = app.extensions.filter((w) => w.name == 'UVR5.AudioPreviewer')
         if (e.length) {
             let orig = e[0].beforeRegisterNodeDef
             e[0].beforeRegisterNodeDef = function(nodeType, nodeData, app) {
-                if(!nodeData?.name?.startsWith("VHS_")) {
+                if(!nodeData?.name?.startsWith("IV2Z_")) {
                     return orig.apply(this, arguments);
                 }
             }
@@ -2231,7 +2231,7 @@ api.addEventListener('executing', ({ detail }) => {
     if (detail === null) {
         for (let graph of [app.graph, ...app.graph.subgraphs.values()]) {
             for (let node of graph._nodes) {
-                if (node.type.startsWith("VHS_")) {
+                if (node.type.startsWith("IV2Z_")) {
                     node.onPromptExecuted?.()
                 }
             }
@@ -2239,20 +2239,20 @@ api.addEventListener('executing', ({ detail }) => {
     }
 })
 function getLatentPreviewCtx(id, width, height) {
-    const node = getNodeById(id)
+    const node = IV2Z_getNodeById(id)
     if (!node) {
         return undefined
     }
 
-    let previewWidget = node.widgets.find((w) => w.name == "vhslatentpreview")
+    let previewWidget = node.widgets.find((w) => w.name == "IV2Zlatentpreview")
     if (!previewWidget) {
         let canvasEl = document.createElement("canvas")
-        previewWidget = node.addDOMWidget("vhslatentpreview", "vhscanvas", canvasEl, {
+        previewWidget = node.addDOMWidget("IV2Zlatentpreview", "IV2Zcanvas", canvasEl, {
             serialize: false,
             hideOnZoom: false,
         });
         previewWidget.serialize = false
-        allowDragFromWidget(previewWidget)
+        IV2Z_allowDragFromWidget(previewWidget)
         canvasEl.addEventListener('contextmenu', (e)  => {
             e.preventDefault()
             return app.canvas._mousedown_callback(e)
@@ -2292,23 +2292,23 @@ function getLatentPreviewCtx(id, width, height) {
         previewWidget.aspectRatio = width / height
         canvasEl.width = width
         canvasEl.height = height
-        fitHeight(node)
+        IV2Z_fitHeight(node)
     }
     return canvasEl.getContext("2d")
 }
 let animateIntervals = {}
 function beginLatentPreview(id, previewImages, rate) {
-    latentPreviewNodes.add(id)
+    IV2Z_latentPreviewNodes.add(id)
     if (animateIntervals[id]) {
         clearTimeout(animateIntervals[id])
     }
     let displayIndex = 0
-    let node = getNodeById(id)
+    let node = IV2Z_getNodeById(id)
     //While progress is safely cleared on execution completion.
     //Initial progress must be started here to avoid a race condition
     node.progress = 0
     animateIntervals[id] = setInterval(() => {
-        if (getNodeById(id)?.progress == undefined
+        if (IV2Z_getNodeById(id)?.progress == undefined
             || app.canvas.graph.rootGraph != node.graph.rootGraph) {
             clearTimeout(animateIntervals[id])
             delete animateIntervals[id]
@@ -2324,7 +2324,7 @@ function beginLatentPreview(id, previewImages, rate) {
 
 }
 let previewImagesDict = {}
-api.addEventListener('VHS_latentpreview', ({ detail }) => {
+api.addEventListener('IV2Z_latentpreview', ({ detail }) => {
     if (detail.id == null) {
         return
     }
@@ -2337,7 +2337,7 @@ api.addEventListener('VHS_latentpreview', ({ detail }) => {
         beginLatentPreview(id, previewImages, detail.rate)
     }
 });
-let td = new TextDecoder()
+let IV2Z_td = new TextDecoder()
 api.addEventListener('b_preview', async (e) => {
     if (Object.keys(animateIntervals).length == 0) {
         return
@@ -2348,7 +2348,7 @@ api.addEventListener('b_preview', async (e) => {
     const dv = new DataView(await e.detail.slice(0,24).arrayBuffer())
     const index = dv.getUint32(4)
     const idlen = dv.getUint8(8)
-    const id = td.decode(dv.buffer.slice(9,9+idlen))
+    const id = IV2Z_td.decode(dv.buffer.slice(9,9+idlen))
     previewImagesDict[id][index] = await window.createImageBitmap(e.detail.slice(24))
     return false
 }, true);

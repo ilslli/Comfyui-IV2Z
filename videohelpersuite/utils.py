@@ -61,8 +61,8 @@ class ContainsAll(dict):
     def __getitem__(self, key):
         return super().get(key, (None, {}))
 
-if "VHS_FORCE_FFMPEG_PATH" in os.environ:
-    ffmpeg_path = os.environ.get("VHS_FORCE_FFMPEG_PATH")
+if "IV2Z_FORCE_FFMPEG_PATH" in os.environ:
+    ffmpeg_path = os.environ.get("IV2Z_FORCE_FFMPEG_PATH")
 else:
     ffmpeg_paths = []
     try:
@@ -70,10 +70,10 @@ else:
         imageio_ffmpeg_path = get_ffmpeg_exe()
         ffmpeg_paths.append(imageio_ffmpeg_path)
     except:
-        if "VHS_USE_IMAGEIO_FFMPEG" in os.environ:
+        if "IV2Z_USE_IMAGEIO_FFMPEG" in os.environ:
             raise
         logger.warn("Failed to import imageio_ffmpeg")
-    if "VHS_USE_IMAGEIO_FFMPEG" in os.environ:
+    if "IV2Z_USE_IMAGEIO_FFMPEG" in os.environ:
         ffmpeg_path = imageio_ffmpeg_path
     else:
         system_ffmpeg = shutil.which("ffmpeg")
@@ -92,12 +92,12 @@ else:
             ffmpeg_path = ffmpeg_paths[0]
         else:
             ffmpeg_path = max(ffmpeg_paths, key=ffmpeg_suitability)
-gifski_path = os.environ.get("VHS_GIFSKI", None)
+gifski_path = os.environ.get("IV2Z_GIFSKI", None)
 if gifski_path is None:
     gifski_path = os.environ.get("JOV_GIFSKI", None)
     if gifski_path is None:
         gifski_path = shutil.which("gifski")
-ytdl_path = os.environ.get("VHS_YTDL", None) or shutil.which('yt-dlp') \
+ytdl_path = os.environ.get("IV2Z_YTDL", None) or shutil.which('yt-dlp') \
         or shutil.which('youtube-dl')
 download_history = {}
 def try_download_video(url):
@@ -124,7 +124,7 @@ def try_download_video(url):
     return file
 
 def is_safe_path(path, strict=False):
-    if "VHS_STRICT_PATHS" not in os.environ and not strict:
+    if "IV2Z_STRICT_PATHS" not in os.environ and not strict:
         return True
     basedir = os.path.abspath('.')
     try:
@@ -173,7 +173,7 @@ def requeue_workflow_unchecked():
     #Ensure batch_managers are marked stale
     prompt = prompt.copy()
     for uid in prompt:
-        if prompt[uid]['class_type'] == 'VHS_BatchManager':
+        if prompt[uid]['class_type'] == 'IV2Z_BatchManager':
             prompt[uid]['inputs']['requeue'] = prompt[uid]['inputs'].get('requeue',0)+1
 
     #execution.py has guards for concurrency, but server doesn't.
@@ -192,9 +192,9 @@ def requeue_workflow(requeue_required=(-1,True)):
         #Calculate a count of how many outputs are managed by a batch manager
         managed_outputs=0
         for bm_uid in prompt:
-            if prompt[bm_uid]['class_type'] == 'VHS_BatchManager':
+            if prompt[bm_uid]['class_type'] == 'IV2Z_BatchManager':
                 for output_uid in prompt:
-                    if prompt[output_uid]['class_type'] in ["VHS_VideoCombine"]:
+                    if prompt[output_uid]['class_type'] in ["IV2Z_VideoCombine"]:
                         for inp in prompt[output_uid]['inputs'].values():
                             if inp == [bm_uid, 0]:
                                 managed_outputs+=1
@@ -217,7 +217,7 @@ def get_audio(file, start_time=0, duration=0):
         audio = torch.frombuffer(bytearray(res.stdout), dtype=torch.float32)
         match = re.search(', (\\d+) Hz, (\\w+), ',res.stderr.decode(*ENCODE_ARGS))
     except subprocess.CalledProcessError as e:
-        raise Exception(f"VHS failed to extract audio from {file}:\n" \
+        raise Exception(f"IV2Z failed to extract audio from {file}:\n" \
                 + e.stderr.decode(*ENCODE_ARGS))
     if match:
         ar = int(match.group(1))

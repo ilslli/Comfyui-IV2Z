@@ -14,7 +14,7 @@ from comfy.k_diffusion.utils import FolderOfImages
 
 web = server.web
 
-@server.PromptServer.instance.routes.get("/vhs/viewvideo")
+@server.PromptServer.instance.routes.get("/IV2Z/viewvideo")
 @server.PromptServer.instance.routes.get("/viewvideo")
 async def view_video(request):
     query = request.rel_url.query
@@ -131,7 +131,7 @@ async def view_video(request):
     except BrokenPipeError as e:
         pass
     return resp
-@server.PromptServer.instance.routes.get("/vhs/viewaudio")
+@server.PromptServer.instance.routes.get("/IV2Z/viewaudio")
 async def view_audio(request):
     query = request.rel_url.query
     path_res = await resolve_path(query)
@@ -175,7 +175,7 @@ async def view_audio(request):
     return resp
 
 query_cache = {}
-@server.PromptServer.instance.routes.get("/vhs/queryvideo")
+@server.PromptServer.instance.routes.get("/IV2Z/queryvideo")
 async def query_video(request):
     query = request.rel_url.query
     filepath = await resolve_path(query)
@@ -265,7 +265,7 @@ async def resolve_path(query):
                     return web.Response(status=204)
         return file, filename, output_dir
 
-@server.PromptServer.instance.routes.get("/vhs/getpath")
+@server.PromptServer.instance.routes.get("/IV2Z/getpath")
 @server.PromptServer.instance.routes.get("/getpath")
 async def get_path(request):
     query = request.rel_url.query

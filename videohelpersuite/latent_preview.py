@@ -27,7 +27,7 @@ class WrappedPreviewer(latent_preview.LatentPreviewer):
             self.latent_rgb_factors = previewer.latent_rgb_factors
             self.latent_rgb_factors_bias = previewer.latent_rgb_factors_bias
         else:
-            raise Exception('Unsupported preview type for VHS animated previews')
+            raise Exception('Unsupported preview type for IV2Z animated previews')
 
     def decode_latent_to_preview_image(self, preview_format, x0):
         if x0.ndim == 5:
@@ -44,7 +44,7 @@ class WrappedPreviewer(latent_preview.LatentPreviewer):
             return None
         if self.first_preview:
             self.first_preview = False
-            serv.send_sync('VHS_latentpreview', {'length':num_images, 'rate': self.rate, 'id': serv.last_node_id})
+            serv.send_sync('IV2Z_latentpreview', {'length':num_images, 'rate': self.rate, 'id': serv.last_node_id})
             self.last_time = new_time + 1/self.rate
         if self.c_index + num_previews > num_images:
             x0 = x0.roll(-self.c_index, 0)[:num_previews]
@@ -98,9 +98,9 @@ def get_latent_video_previewer(device, latent_format, *args, **kwargs):
     try:
         extra_info = next(serv.prompt_queue.currently_running.values().__iter__()) \
                 [3]['extra_pnginfo']['workflow']['extra']
-        prev_setting = extra_info.get('VHS_latentpreview', False)
-        if extra_info.get('VHS_latentpreviewrate', 0) != 0:
-            rate_setting = extra_info['VHS_latentpreviewrate']
+        prev_setting = extra_info.get('IV2Z_latentpreview', False)
+        if extra_info.get('IV2Z_latentpreviewrate', 0) != 0:
+            rate_setting = extra_info['IV2Z_latentpreviewrate']
         else:
             rate_setting = rates_table.get(latent_format.__class__.__name__, 8)
     except:

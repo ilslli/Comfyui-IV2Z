@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ComfyUI-VideoHelperSuite
 Nodes related to video workflows
 
@@ -108,3 +109,7 @@ Fields can be exposed in the webui as a widget using a format similar to what is
 - The name of the widget that will be displayed in the web ui
 - Either a primitive such as "INT" or "BOOLEAN", or a list of string options
 - A dictionary of options
+=======
+# Comfyui-IV2Z
+将视频打成压缩包并输出
+>>>>>>> 8c4c2a7e02531eaf9deb06d615c1e4de7d4c66e7

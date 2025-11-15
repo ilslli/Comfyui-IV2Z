@@ -248,6 +248,7 @@ class VideoCombine:
                 "pingpong": ("BOOLEAN", {"default": False}),
                 "save_output": ("BOOLEAN", {"default": True}),
                 "save_as_zip": ("BOOLEAN", {"default": False}), # 打包为zip
+                "polyglot_png": ("BOOLEAN", {"default": False}), # 压缩包与图片组合
             },
             "optional": {
                 "audio": ("AUDIO",),
@@ -285,6 +286,7 @@ class VideoCombine:
         meta_batch=None,
         vae=None,
         save_as_zip=False, # 打包为zip
+        polyglot_png=False, # 压缩包与图片组合
         **kwargs
     ):
         if latents is not None:
@@ -622,6 +624,7 @@ class VideoCombine:
             preview['format'] = 'image/png'
             preview['filename'] = file.replace('%03d', '001')
 
+        zip_path = None
         if save_as_zip and output_files:
             zip_filename = f"{filename}_{counter:05}.zip"
             zip_path = os.path.join(full_output_folder, zip_filename)
@@ -631,6 +634,25 @@ class VideoCombine:
                         arcname = os.path.basename(file)
                         zf.write(file, arcname)
             output_files.append(zip_path)
+        
+        if polyglot_png and zip_path and first_image_file.endswith('.png'):
+            cover_png = os.path.join(full_output_folder, first_image_file)
+            hybrid_name = f"{filename}_{counter:05}_hybrid.png"
+            hybrid_path = os.path.join(full_output_folder, hybrid_name)
+            with open(hybrid_path, 'wb') as hf:
+                hf.write(open(cover_png, 'rb').read())
+                hf.write(open(zip_path, 'rb').read())
+            output_files.append(hybrid_path)
+
+            # ✅ 前端只显示这张杂交图（格式仍为 PNG）
+            preview = {
+                "filename": hybrid_name,
+                "subfolder": subfolder,
+                "type": "output" if save_output else "temp",
+                "format": "image/png",        # 保持 PNG 预览
+                "fullpath": hybrid_path,
+            }
+            return {"ui": {"gifs": [preview]}, "result": ((save_output, output_files),)}
 
         return {"ui": {"gifs": [preview]}, "result": ((save_output, output_files),)}
 

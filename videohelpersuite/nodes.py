@@ -14,6 +14,7 @@ from string import Template
 import itertools
 import functools
 import zipfile
+import io
 
 import folder_paths
 from .logger import logger
@@ -249,6 +250,7 @@ class VideoCombine:
                 "save_output": ("BOOLEAN", {"default": True}),
                 "save_as_zip": ("BOOLEAN", {"default": False}), # 打包为zip
                 "polyglot_png": ("BOOLEAN", {"default": False}), # 压缩包与图片组合
+                "use_solid_shell": ("BOOLEAN", {"default": False}), # 将插图变为纯色图片
             },
             "optional": {
                 "audio": ("AUDIO",),
@@ -287,6 +289,7 @@ class VideoCombine:
         vae=None,
         save_as_zip=False, # 打包为zip
         polyglot_png=False, # 压缩包与图片组合
+        use_solid_shell=False, # 将插图变为纯色图片
         **kwargs
     ):
         if latents is not None:
@@ -635,21 +638,37 @@ class VideoCombine:
                         zf.write(file, arcname)
             output_files.append(zip_path)
         
-        if polyglot_png and zip_path and first_image_file.endswith('.png'):
-            cover_png = os.path.join(full_output_folder, first_image_file)
-            hybrid_name = f"{filename}_{counter:05}_hybrid.png"
+        if polyglot_png and zip_path:
+            # 纯色外壳开关
+            if use_solid_shell:
+                # 1. 现场生成纯色 PNG（RGBA，可调）
+                solid_color = (0, 0, 0, 255)          # 黑色，可改任意 RGBA
+                img = Image.new("RGBA", (512, 512), solid_color)
+                png_bytes = io.BytesIO()
+                img.save(png_bytes, format="PNG")
+                png_bytes.seek(0)
+                shell_data = png_bytes.getvalue()
+                hybrid_name = f"{filename}_{counter:05}_hybrid_solid.png"
+            else:
+                # 2. 仍用原有封面图当外壳
+                cover_png = os.path.join(full_output_folder, first_image_file)
+                with open(cover_png, 'rb') as f:
+                    shell_data = f.read()
+                hybrid_name = f"{filename}_{counter:05}_hybrid.png"
+
+            # 3. 写出杂交文件
             hybrid_path = os.path.join(full_output_folder, hybrid_name)
             with open(hybrid_path, 'wb') as hf:
-                hf.write(open(cover_png, 'rb').read())
-                hf.write(open(zip_path, 'rb').read())
+                hf.write(shell_data)                  # PNG 部分
+                hf.write(open(zip_path, 'rb').read())  # ZIP 部分
             output_files.append(hybrid_path)
 
-            # ✅ 前端只显示这张杂交图（格式仍为 PNG）
+            # 4. 前端预览这张杂交图
             preview = {
                 "filename": hybrid_name,
                 "subfolder": subfolder,
                 "type": "output" if save_output else "temp",
-                "format": "image/png",        # 保持 PNG 预览
+                "format": "image/png",
                 "fullpath": hybrid_path,
             }
             return {"ui": {"gifs": [preview]}, "result": ((save_output, output_files),)}
